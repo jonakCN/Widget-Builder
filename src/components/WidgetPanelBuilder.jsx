@@ -113,12 +113,14 @@ const Header = ({
 	setIsDropdownOpen,
 	savedLayouts,
 	loadLayout,
+	selectedLayout,
 }) => {
 	return (
 		<div className='bg-gradient-to-r from-blue-600 to-blue-800 border-b border-blue-700 shadow-lg sticky top-0 z-50'>
 			<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-				<div className='flex items-center justify-between h-16'>
-					<div className='flex items-center space-x-3'>
+				<div className='flex items-center justify-between h-16 relative'>
+					{/* Left side */}
+					<div className='flex items-center space-x-3 w-1/3'>
 						<div className='flex items-center justify-center w-10 h-10 rounded-xl bg-white bg-opacity-20 backdrop-blur-sm'>
 							<LayoutGrid size={24} className='text-white' />
 						</div>
@@ -126,18 +128,39 @@ const Header = ({
 							Widget Builder
 						</h1>
 					</div>
-					<div className='relative'>
+
+					{/* Center - Selected Layout Name */}
+					<div className='flex-1 flex justify-center w-1/3'>
+						<AnimatePresence mode='wait'>
+							{selectedLayout && (
+								<motion.div
+									initial={{ opacity: 0, y: -20 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: 20 }}
+									transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+									className='flex items-center'>
+									<div className='flex items-center gap-3 px-6 py-2 bg-white/10 backdrop-blur-sm rounded-full'>
+										<Layout size={18} className='text-white/80' />
+										<span className='text-base font-medium text-white'>
+											{selectedLayout.name}
+										</span>
+									</div>
+								</motion.div>
+							)}
+						</AnimatePresence>
+					</div>
+
+					{/* Right side */}
+					<div className='relative w-1/3 flex justify-end'>
 						<motion.button
 							whileHover={{ scale: 1.02 }}
 							whileTap={{ scale: 0.98 }}
 							onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-							className='flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-white/10 rounded-md hover:bg-white/20'
-						>
+							className='flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-white/10 rounded-md hover:bg-white/20'>
 							Load Layout
 							<motion.div
 								animate={{ rotate: isDropdownOpen ? 180 : 0 }}
-								transition={{ duration: 0.2 }}
-							>
+								transition={{ duration: 0.2 }}>
 								<ChevronDown size={16} />
 							</motion.div>
 						</motion.button>
@@ -156,43 +179,38 @@ const Header = ({
 										initial={{ opacity: 0, y: -10, scale: 0.95 }}
 										animate={{ opacity: 1, y: 0, scale: 1 }}
 										exit={{ opacity: 0, y: -10, scale: 0.95 }}
-										transition={{ 
+										transition={{
 											duration: 0.2,
-											ease: [0.4, 0, 0.2, 1]
+											ease: [0.4, 0, 0.2, 1],
 										}}
-										className='absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-50 overflow-hidden'
-									>
+										className='absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-200 z-50 overflow-hidden'>
 										{savedLayouts.length === 0 ? (
 											<motion.div
 												initial={{ opacity: 0 }}
 												animate={{ opacity: 1 }}
-												className='px-4 py-3 text-sm text-gray-500'
-											>
+												className='px-4 py-3 text-sm text-gray-500'>
 												No saved layouts
 											</motion.div>
 										) : (
-											<motion.div 
-												className='py-1 max-h-[400px] overflow-y-auto'
-											>
+											<motion.div className='py-1 max-h-[400px] overflow-y-auto'>
 												{savedLayouts.map((savedLayout, index) => (
 													<motion.button
 														key={savedLayout.id}
 														initial={{ opacity: 0, x: -10 }}
 														animate={{ opacity: 1, x: 0 }}
-														transition={{ 
+														transition={{
 															delay: index * 0.05,
-															duration: 0.2
+															duration: 0.2,
 														}}
-														whileHover={{ 
+														whileHover={{
 															backgroundColor: '#F3F4F6',
-															x: 4
+															x: 4,
 														}}
 														onClick={() => {
 															loadLayout(savedLayout);
 															setIsDropdownOpen(false);
 														}}
-														className='w-full text-left px-4 py-2 text-sm text-gray-700'
-													>
+														className='w-full text-left px-4 py-2 text-sm text-gray-700'>
 														{savedLayout.name}
 													</motion.button>
 												))}
@@ -1625,9 +1643,9 @@ const SideDrawer = ({
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 0.5 }}
 						exit={{ opacity: 0 }}
-						transition={{ 
+						transition={{
 							duration: 0.3,
-							ease: [0.4, 0, 0.2, 1] // Smooth easeInOut
+							ease: [0.4, 0, 0.2, 1], // Smooth easeInOut
 						}}
 						className='fixed inset-0 bg-black bg-opacity-50'
 						onClick={onClose}
@@ -1642,33 +1660,29 @@ const SideDrawer = ({
 							duration: 0.3,
 							ease: [0.4, 0, 0.2, 1], // Smooth easeInOut
 						}}
-						className='fixed inset-y-0 right-0 w-80 bg-white shadow-xl border-l border-gray-200 z-50'
-					>
+						className='fixed inset-y-0 right-0 w-80 bg-white shadow-xl border-l border-gray-200 z-50'>
 						<div className='flex items-center justify-between p-4 border-b border-gray-200'>
-							<motion.h2 
+							<motion.h2
 								initial={{ opacity: 0, y: 10 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{ delay: 0.1, duration: 0.2 }}
-								className='text-lg font-semibold text-gray-800'
-							>
+								className='text-lg font-semibold text-gray-800'>
 								Edit {selectedWidget.type}
 							</motion.h2>
 							<motion.button
 								whileHover={{ scale: 1.05 }}
 								whileTap={{ scale: 0.95 }}
 								onClick={onClose}
-								className='p-2 hover:bg-gray-100 rounded-lg'
-							>
+								className='p-2 hover:bg-gray-100 rounded-lg'>
 								<X size={20} />
 							</motion.button>
 						</div>
 
-						<motion.div 
+						<motion.div
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
 							transition={{ delay: 0.2 }}
-							className='overflow-y-auto h-[calc(100vh-64px)]'
-						>
+							className='overflow-y-auto h-[calc(100vh-64px)]'>
 							{selectedWidget.type.startsWith('Column') && (
 								<ColumnControls
 									widget={selectedWidget}
@@ -1683,7 +1697,10 @@ const SideDrawer = ({
 								/>
 							)}
 							{selectedWidget.type === 'Image' && (
-								<ImageControls widget={selectedWidget} updateWidget={setTempWidget} />
+								<ImageControls
+									widget={selectedWidget}
+									updateWidget={setTempWidget}
+								/>
 							)}
 							{selectedWidget.type === 'Button' && (
 								<ButtonControls
@@ -1692,19 +1709,24 @@ const SideDrawer = ({
 								/>
 							)}
 							{selectedWidget.type === 'Card' && (
-								<CardControls widget={tempWidget} updateWidget={setTempWidget} />
+								<CardControls
+									widget={tempWidget}
+									updateWidget={setTempWidget}
+								/>
 							)}
 							{selectedWidget.type === 'Table' && (
-								<TableControls widget={tempWidget} updateWidget={setTempWidget} />
+								<TableControls
+									widget={tempWidget}
+									updateWidget={setTempWidget}
+								/>
 							)}
 
 							<div className='p-4 border-t border-gray-200 bg-white sticky bottom-0'>
 								{error && (
-									<motion.p 
+									<motion.p
 										initial={{ opacity: 0, y: 5 }}
 										animate={{ opacity: 1, y: 0 }}
-										className='text-sm text-red-500 mb-2'
-									>
+										className='text-sm text-red-500 mb-2'>
 										{error}
 									</motion.p>
 								)}
@@ -1718,8 +1740,7 @@ const SideDrawer = ({
 												? 'bg-gray-300 cursor-not-allowed'
 												: 'bg-blue-500 hover:bg-blue-600 text-white'
 										}`}
-										disabled={!!error}
-									>
+										disabled={!!error}>
 										<Save size={16} />
 										Save Changes
 									</motion.button>
@@ -1727,8 +1748,7 @@ const SideDrawer = ({
 										whileHover={{ scale: 1.02 }}
 										whileTap={{ scale: 0.98 }}
 										onClick={() => onDelete(selectedWidget.i)}
-										className='p-2 text-red-500 hover:bg-red-50 rounded-lg'
-									>
+										className='p-2 text-red-500 hover:bg-red-50 rounded-lg'>
 										<Trash2 size={20} />
 									</motion.button>
 								</div>
@@ -1811,6 +1831,7 @@ const WidgetPanelBuilder = () => {
 		return saved ? JSON.parse(saved) : [];
 	});
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+	const [selectedLayout, setSelectedLayout] = useState(null);
 
 	useEffect(() => {
 		localStorage.setItem('savedLayouts', JSON.stringify(savedLayouts));
@@ -1864,19 +1885,17 @@ const WidgetPanelBuilder = () => {
 	};
 
 	const loadLayout = (savedLayout) => {
+		setSelectedLayout(savedLayout);
 		setWidgets(savedLayout.widgets);
 		setLayout(savedLayout.layout);
 		setIsDropdownOpen(false);
 	};
 
-	const clearCanvas = () => {
-		if (
-			window.confirm(
-				'Are you sure you want to clear all widgets from the canvas?'
-			)
-		) {
+	const handleClear = () => {
+		if (window.confirm('Are you sure you want to clear the canvas?')) {
 			setWidgets([]);
 			setLayout([]);
+			setSelectedLayout(null);
 		}
 	};
 
@@ -1887,6 +1906,7 @@ const WidgetPanelBuilder = () => {
 				setIsDropdownOpen={setIsDropdownOpen}
 				savedLayouts={savedLayouts}
 				loadLayout={loadLayout}
+				selectedLayout={selectedLayout}
 			/>
 			<div className='flex flex-1 relative'>
 				<WidgetPanel onDragStart={handleDragStart} isCollapsed={isCollapsed} />
@@ -1904,7 +1924,7 @@ const WidgetPanelBuilder = () => {
 			{/* Floating action buttons */}
 			<div className='fixed bottom-6 right-6 flex gap-3'>
 				<button
-					onClick={clearCanvas}
+					onClick={handleClear}
 					className='p-3 bg-red-600 text-white rounded-full shadow-lg hover:bg-red-700 transition-colors'
 					title='Clear canvas'>
 					<Trash2 size={24} />
